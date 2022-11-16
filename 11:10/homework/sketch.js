@@ -1,10 +1,11 @@
 /*
 steps to take when wanting to visualize data:
-1 sanitize data
-2 draw points on present axis (temp values to y pos)
-3 draw points on future axis (same as above)
-4 connect points with line
-5 give present points a name
+1 sanitize data !done
+2 display names on y axis
+3 sort by latitude
+3 draw graphs on x axis (in)
+5 connect points with line
+6 give present points a name
 */
 
 let table;
@@ -16,7 +17,8 @@ let zeroX;
 let zeroY;
 let yOffset = 20;
 
-let startHue = 275;
+let _hue = 275;
+let nowPos, futurePos;
 
 function preload () {
     table = loadTable('future_cities_data.csv', 'csv', 'header');
@@ -24,7 +26,7 @@ function preload () {
 
 function setup () {
     createCanvas(windowWidth, windowHeight);
-    //noCursor();
+    noCursor();
 
     for (r = 0; r < 20; r++) {
         cities.push(table.getString(r, 'current_city'));
@@ -37,52 +39,65 @@ function setup () {
 
     colorMode(HSB);
 
-    zeroX = width/2;
+    zeroX = 100;
     zeroY = height - 20;
+
+    nowPos = 50;
+    futurePos = zeroX * 5;
 
 }
 
 function draw () {
     background(255);
     textSize(5);
-    //noStroke();
-    stroke(startHue, 100, 100);
-    fill(startHue, 100, 100);
+    noStroke();
+    //stroke(startHue, 100, 100);
+    fill(_hue, 100, 100);
 
     translate(zeroX, zeroY);
     scale(1, -1);
     
     for (i = 0; i < cities.length; i++) {
-        fill(startHue, 100, 100);
-        circle(10, tempNow[i] * yOffset, 10);
+        stroke(_hue, 100, 100);
+        line(nowPos, (tempNow[i] * yOffset), futurePos, (tempFuture[i] * yOffset));
+        noStroke();
+        fill(_hue, 100, 100);
+        circle(nowPos, tempNow[i] * yOffset, 10);
             push();
             scale(1, -1);
             textAlign(RIGHT);
-            text(cities[i], 0, -tempNow[i] * yOffset);
+            text(cities[i], nowPos-10, -tempNow[i] * yOffset);
             pop();
-        fill(startHue+90, 100, 100);
-        circle(100, tempFuture[i] * yOffset, 10);
+        fill(_hue, 100, 100);
+        circle(futurePos, tempFuture[i] * yOffset, 10);
             push();
             scale(1, -1);
             textAlign(LEFT);
-            text(cities[i], 110, -tempFuture[i] * yOffset);
+            text(cities[i], futurePos+10, -tempFuture[i] * yOffset);
             pop();
-        stroke(startHue, 100, 100);
-        line(10, (tempNow[i] * yOffset), 100, (tempFuture[i] * yOffset));
-        noStroke();
+        
+        _hue = _hue + 10;
+        
     }
 
     //draw x axis
-    stroke(0, 0, 0);
-    line(0, 0, 150, 0);
-    text(time, 150, 0);
+    stroke(0);
+    line(0, 0, futurePos+100, 0);
+    push();
+        noStroke();
+        scale(1, -1);
+        textAlign(LEFT);
+        text('time', futurePos+110, 0);
+    pop();
 
     //draw y axis
-    line(0, 0, 0, height-20);
-    text(temperature, 0, 0);
-    noStroke();
+    stroke(0);
+    line(0, 0, 0, tempFuture[5]*100);
+    push();
+        noStroke();
+        scale(1, -1);
+        textAlign(LEFT);
+        text('temperature', 0, -height-100);
+    pop();
 
 }
-
-
-
